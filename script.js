@@ -1,31 +1,54 @@
-
-function moverBotao() {
-  const cartao = document.querySelector(".cartao");
+document.addEventListener("DOMContentLoaded", () => {
+  const botaoSim = document.getElementById("sim");
+  const botaoNao = document.getElementById("nao");
   const botoes = document.querySelector(".botoes");
+  const mensagem = document.getElementById("mensagem");
 
-  // Limita o botão à área dos botões
-  const area = botoes.getBoundingClientRect();
-  const largura = nao.offsetWidth;
-  const altura = nao.offsetHeight;
-  const margem = 8;
+  if (!botaoSim || !botaoNao || !botoes || !mensagem) return;
 
-  nao.style.position = "fixed";
+  // Ao tocar/clicar em SIM, mostra a mensagem especial.
+  botaoSim.addEventListener("click", () => {
+    mensagem.hidden = false;
+    botoes.hidden = true;
+    mensagem.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 
-  const minX = Math.max(margem, area.left);
-  const maxX = Math.min(
-    window.innerWidth - largura - margem,
-    area.right - largura
-  );
+  // Faz o NÃO escapar, sem sair dos limites da tela no celular.
+  function moverBotao() {
+    const area = botoes.getBoundingClientRect();
+    const largura = botaoNao.offsetWidth;
+    const altura = botaoNao.offsetHeight;
+    const margem = 8;
 
-  const minY = Math.max(margem, area.top);
-  const maxY = Math.min(
-    window.innerHeight - altura - margem,
-    area.bottom - altura
-  );
+    const minX = Math.max(margem, area.left);
+    const maxX = Math.max(minX, Math.min(
+      window.innerWidth - largura - margem,
+      area.right - largura
+    ));
+    const minY = Math.max(margem, area.top);
+    const maxY = Math.max(minY, Math.min(
+      window.innerHeight - altura - margem,
+      area.bottom - altura
+    ));
 
-  const x = minX + Math.random() * Math.max(0, maxX - minX);
-  const y = minY + Math.random() * Math.max(0, maxY - minY);
+    botaoNao.style.position = "fixed";
+    botaoNao.style.left = `${minX + Math.random() * (maxX - minX)}px`;
+    botaoNao.style.top = `${minY + Math.random() * (maxY - minY)}px`;
+    botaoNao.style.zIndex = "10";
+  }
 
-  nao.style.left = `${x}px`;
-  nao.style.top = `${y}px`;
-}
+  botaoNao.addEventListener("pointerenter", (event) => {
+    if (event.pointerType === "mouse") moverBotao();
+  });
+
+  botaoNao.addEventListener("touchstart", (event) => {
+    event.preventDefault();
+    moverBotao();
+  }, { passive: false });
+
+  // Também funciona se a pessoa conseguir tocar/clicar no botão.
+  botaoNao.addEventListener("click", (event) => {
+    event.preventDefault();
+    moverBotao();
+  });
+});
